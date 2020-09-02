@@ -3,17 +3,19 @@ var   express     = require('express'),
       port        = process.env.PORT || 3000,
       bodyParser  = require('body-parser');
 
-// body parser setup
+// front end setup = body parser and views dir
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/views'));
 
 // route files
 
 var todoRoutes  = require('./routes/todos');
 
 app.get('/', function(req, res){
-  res.json({message: "Hi from root route"});
+  res.sendFile("index.html");
 });
 
 app.use('/api/todos', todoRoutes);
