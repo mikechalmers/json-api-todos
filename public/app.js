@@ -14,6 +14,13 @@ $(document).ready(function(){
     }
   });
 
+  // add the listener to the span (as it exists on page load and the spans don't)
+  // then apply it to the spans as second argument
+  $('.list').on('click', 'span', function(){
+    removeTodo($(this).parent());
+  });
+
+
 });
 
 function addTodos(todos){
@@ -23,7 +30,9 @@ function addTodos(todos){
 }
 
 function addTodo(todo){
-  var newTodo = $('<li class="task">' + todo.name + '</li>');
+  var newTodo = $('<li class="task">' + todo.name + '<span>X</span></li>');
+  // add the id to the jQuery data so we can identify and delete later
+  newTodo.data('id', todo._id);
   if(todo.completed){
     newTodo.addClass("done");
   }
@@ -39,6 +48,24 @@ function createTodo(){
   .then(function(newTodo){
     $('#todoInput').val('');
     addTodo(newTodo);
+  })
+  .catch(function(err){
+    console.log(err);
+  });
+}
+
+function removeTodo(todo){
+  // grab the id from the jQuery data we added in the addTodo function
+  var clickedId = todo.data('id');
+  var deleteUrl = 'api/todos/' + clickedId;
+
+  $.ajax({
+    method: 'DELETE',
+    url: deleteUrl
+  })
+  .then(function(data){
+    console.log(data);
+    todo.remove();
   })
   .catch(function(err){
     console.log(err);
