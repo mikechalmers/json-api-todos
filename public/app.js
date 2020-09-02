@@ -14,9 +14,15 @@ $(document).ready(function(){
     }
   });
 
+  $('.list').on('click', 'li', function(){
+    updateTodo($(this));
+  });
+
   // add the listener to the span (as it exists on page load and the spans don't)
   // then apply it to the spans as second argument
-  $('.list').on('click', 'span', function(){
+  $('.list').on('click', 'span', function(event){
+    // don't want the done click listener working on this
+    event.stopPropagation();
     removeTodo($(this).parent());
   });
 
@@ -33,6 +39,7 @@ function addTodo(todo){
   var newTodo = $('<li class="task">' + todo.name + '<span>X</span></li>');
   // add the id to the jQuery data so we can identify and delete later
   newTodo.data('id', todo._id);
+  newTodo.data('completed', todo.completed);
   if(todo.completed){
     newTodo.addClass("done");
   }
@@ -69,5 +76,22 @@ function removeTodo(todo){
   })
   .catch(function(err){
     console.log(err);
+  });
+}
+
+function updateTodo(todo){
+  var updateUrl = 'api/todos/' + todo.data('id');
+  var isDone = !todo.data('completed');
+  var updateData = {completed: isDone};
+  console.log(updateData);
+
+  $.ajax({
+    method: 'PUT',
+    url: updateUrl,
+    data: updateData
+  })
+  .then(function(updatedTodo){
+    todo.toggleClass("done");
+    todo.data('completed', isDone);
   });
 }
